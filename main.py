@@ -2,6 +2,7 @@ import os
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from sports_package import Player, Team, Match
+from data.loader import load_from_json, get_available_files
 
 # Временная "база данных" в памяти для демонстрации работы интерфейса
 teams = {}
@@ -13,6 +14,7 @@ def create_team():
     else:
         teams[name] = Team(name)
         print(f"Команда '{name}' успешно создана.")
+
 
 def create_player():
     if not teams:
@@ -30,6 +32,7 @@ def create_player():
     player = Player(p_name, position)
     teams[t_name].add_player(player)
     print(f"Игрок {p_name} добавлен в команду {t_name}.")
+
 
 def record_match():
     if len(teams) < 2:
@@ -75,6 +78,7 @@ def record_match():
         except ValueError:
             print("Неверный ввод, статистика для этого игрока пропущена.")
 
+
 def show_stats():
     if not teams:
         print("Данные отсутствуют.")
@@ -90,6 +94,7 @@ def show_stats():
                 print(f"    - {p.name} ({p.position}): Матчей: {p.matches_played}, Голы: {p.goals}, Пасы: {p.assists}, Очки(Г+П): {p.get_points()}, Ср. голов за матч: {p.get_avg_goals()}")
         else:
             print("  Игроков в составе пока нет.")
+
 
 def export_to_excel():
     if not teams:
@@ -155,6 +160,31 @@ def export_to_excel():
     wb.save(filename)
     print(f"Отчет успешно сохранен в файл '{filename}'!")
 
+
+def import_data_menu():
+    files = get_available_files()
+    if not files:
+        print("В папке 'data' не найдено ни одного .json файла!")
+        return
+
+    print("\nДоступные файлы в папке data:")
+    for idx, f in enumerate(files, 1):
+        print(f"  {idx}. {f}")
+
+    choice = input("Введите номер файла или его имя: ").strip()
+    
+    # Позволяем выбрать файл как по номеру из списка, так и по названию
+    if choice.isdigit() and 1 <= int(choice) <= len(files):
+        filename = files[int(choice) - 1]
+    else:
+        filename = choice
+        if not filename.endswith(".json"):
+            filename += ".json"
+
+    load_from_json(filename, teams)
+
+
+
 def main():
     while True:
         print("\n=== Панель управления турниром ===")
@@ -163,9 +193,10 @@ def main():
         print("3. Зафиксировать результат матча")
         print("4. Показать текущую статистику")
         print("5. Экспортировать отчет в .xlsx")
-        print("6. Выйти")
+        print("6. Загрузить данные из файла (.json)")  # Новый пункт
+        print("7. Выйти")
         
-        choice = input("Выберите действие (1-6): ").strip()
+        choice = input("Выберите действие (1-7): ").strip()
         
         if choice == "1":
             create_team()
@@ -178,6 +209,8 @@ def main():
         elif choice == "5":
             export_to_excel()
         elif choice == "6":
+            import_data_menu()
+        elif choice == "7":
             print("Завершение работы программы.")
             break
         else:
