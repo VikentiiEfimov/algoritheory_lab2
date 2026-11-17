@@ -1,4 +1,6 @@
 class Player:
+    HEADER_LABELS = ["Игрок", "Позиция", "Матчи", "Гол + Пас", "Ср. голов"]
+
     def __init__(self, name: str, position: str):
         self.name = name
         self.position = position
@@ -19,3 +21,18 @@ class Player:
         if self.matches_played == 0:
             return 0.0
         return round(self.goals / self.matches_played, 2)
+
+    def to_excel_row(self) -> list:
+        """Возвращает список значений игрока для строки Excel."""
+        return [
+            self.name,
+            self.position,
+            self.matches_played,
+            f"{self.goals} + {self.assists} ({self.get_points()})",
+            self.get_avg_goals()
+        ]
+
+    def get_info(self) -> str:
+        """Собирает строку для консоли, соединяя заголовки и значения через zip."""
+        pairs = [f"{label}: {val}" for label, val in zip(self.HEADER_LABELS, self.to_excel_row())]
+        return "\n".join(pairs)

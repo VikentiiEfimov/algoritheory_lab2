@@ -6,6 +6,7 @@ class Match:
         self.away_team = away_team
         self.home_goals = home_goals
         self.away_goals = away_goals
+        self.player_stats: dict = {}
         self._process_match()
 
     def _process_match(self):
@@ -18,4 +19,11 @@ class Match:
         else:
             self.home_team.add_match_result("draw")
             self.away_team.add_match_result("draw")
-    
+
+    def set_player_stats(self, stats: dict) -> None:
+        """Сохраняет статистику игроков в этом матче."""
+        self.player_stats.update(stats)
+
+    def get_result_info(self) -> str:
+        return (f"Матч зафиксирован: {self.home_team.name} "
+                f"{self.home_goals} : {self.away_goals} {self.away_team.name}")
