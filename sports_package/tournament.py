@@ -1,8 +1,9 @@
+from .base import BaseEntity
 from .player import Player
 from .team import Team
 from .match import Match
 
-class Tournament:
+class Tournament(BaseEntity):
     def __init__(self, name: str):
         self.name = name
         self.teams: dict[str, Team] = {}
@@ -127,3 +128,17 @@ class Tournament:
 
         return sections
 
+
+    # --- Реализация методов абстрактного класса ---
+    def to_excel_row(self) -> list:
+        return [self.name, len(self.teams), len(self.matches)]
+
+    def get_info(self) -> str:
+        return f"Турнир: {self.name} (Команд: {len(self.teams)}, Матчей: {len(self.matches)})"
+
+    # --- Dunder-методы ---
+    def __str__(self) -> str:
+        return self.get_info()
+
+    def __len__(self) -> int:
+        return len(self.teams)
