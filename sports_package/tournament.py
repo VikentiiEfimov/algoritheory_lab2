@@ -37,12 +37,12 @@ class Tournament(BaseEntity):
         away = self.get_team(away_name)
         match = Match(home, away, home_goals, away_goals)
 
+        stats = player_stats or {}
+        for team in (home, away):
+            for player in team.players.values():
+                goals, assists = stats.get(player.name, (0, 0))
+                player.add_stats(goals, assists)
         if player_stats:
-            for team in (home, away):
-                for player in team.players.values():
-                    if player.name in player_stats:
-                        goals, assists = player_stats[player.name]
-                        player.add_stats(goals, assists)
             match.set_player_stats(player_stats)
 
         self.matches.append(match)

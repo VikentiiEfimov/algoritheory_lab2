@@ -78,7 +78,7 @@ class Team(BaseEntity):
                 self.wins, self._draws, self._losses]
 
     def get_info(self) -> str:
-        pairs = [f"{label}: {val}" for label, val in zip(self.HEADER_LABELS, self.to_excel_row())]
+        pairs = [f"{label:<15} {val}" for label, val in zip(self.HEADER_LABELS, self.to_excel_row())]
         return "\n".join(pairs)
 
     # --- Dunder-методы ---

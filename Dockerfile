@@ -5,6 +5,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Отключаем буферизацию вывода Python (важно для консольных приложений в Docker)
+ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
 # Сначала копируем только requirements, чтобы кэш слоёв работал эффективнее

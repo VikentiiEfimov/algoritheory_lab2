@@ -10,4 +10,3 @@ venv/
 *.db
 tournament_report.xlsx
 README.md
-tests/

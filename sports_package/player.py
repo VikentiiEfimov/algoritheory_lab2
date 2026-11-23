@@ -2,7 +2,7 @@ from .base import BaseEntity
 
 class Player(BaseEntity):
     HEADER_LABELS = ["Игрок", "Позиция", "Матчи", "Гол + Пас", "Ср. голов"]
-    VALID_POSITIONS = {"Нападающий", "Защитник", "Вратарь"}
+    VALID_POSITIONS = {"Нападающий", "Защитник", "Вратарь", "Полузащитник"}
 
     def __init__(self, name: str, position: str):
         self.name = name
@@ -72,7 +72,7 @@ class Player(BaseEntity):
                 f"{self.goals} + {self.assists} ({self.get_points()})", self.get_avg_goals()]
 
     def get_info(self) -> str:
-        pairs = [f"{label}: {val}" for label, val in zip(self.HEADER_LABELS, self.to_excel_row())]
+        pairs = [f"{label:<15} {val}" for label, val in zip(self.HEADER_LABELS, self.to_excel_row())]
         return "\n".join(pairs)
 
     # --- Dunder-методы ---
