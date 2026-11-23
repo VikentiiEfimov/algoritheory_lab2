@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.git/
+.gitignore
+.pytest_cache/
+*.xlsx
+*.db
+tournament_report.xlsx
+README.md
+tests/

@@ -12,3 +12,9 @@
    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
    .\.venv\Scripts\Activate.ps1
    pip install -r requirements.txt
+
+## Запуск через Docker (уровень Well-done)
+
+### 1. Собрать образ
+```bash
+docker build -t sports-tournament .

@@ -1,7 +1,7 @@
 from openpyxl import Workbook
 from openpyxl.styles import Font
 
-from sports_package import Player, Team, Tournament
+from sports_package import Player, Team, Tournament, database
 from data.loader import load_from_json, get_available_files
 
 
@@ -237,6 +237,29 @@ def import_data_menu(tournament: Tournament) -> None:
         filename = choice if choice.endswith(".json") else choice + ".json"
     load_from_json(filename, tournament)
 
+def save_to_db(tournament: Tournament) -> None:
+    """Сохраняет турнир в SQLite3."""
+    try:
+        conn = database.get_connection()
+        database.init_db(conn)
+        database.save_tournament(tournament, conn)
+        conn.close()
+    except Exception as e:
+        print(f"[Ошибка БД] {e}")
+
+
+def load_from_db() -> Tournament:
+    """Загружает турнир из SQLite3."""
+    try:
+        conn = database.get_connection()
+        database.init_db(conn)
+        tournament = database.load_tournament(conn)
+        conn.close()
+        return tournament
+    except Exception as e:
+        print(f"[Ошибка БД] {e}")
+        return Tournament("Футбольный турнир")
+
 def main() -> None:
     tournament = Tournament("Футбольный турнир")
     while True:
@@ -244,12 +267,14 @@ def main() -> None:
         print("1. Создать команду")
         print("2. Добавить игрока в команду")
         print("3. Зафиксировать результат матча")
-        print("4. Показать статистику (Игрок / Команда / Турнир)")
+        print("4. Показать статистику")
         print("5. Экспортировать отчёт в .xlsx")
         print("6. Загрузить данные из .json")
-        print("7. Выйти")
-        
-        choice = input("Выберите действие (1-7): ").strip()
+        print("7. Сохранить в БД (SQLite3)")
+        print("8. Загрузить из БД (SQLite3)")
+        print("9. Выйти")
+
+        choice = input("Выберите действие (1-9): ").strip()
 
         if choice == "1":
             create_team(tournament)
@@ -258,12 +283,16 @@ def main() -> None:
         elif choice == "3":
             record_match(tournament)
         elif choice == "4":
-            statistics_menu(tournament) 
+            statistics_menu(tournament)
         elif choice == "5":
             export_to_excel(tournament)
         elif choice == "6":
             import_data_menu(tournament)
         elif choice == "7":
+            save_to_db(tournament)
+        elif choice == "8":
+            tournament = load_from_db()
+        elif choice == "9":
             print("Завершение работы программы.")
             break
         else:
