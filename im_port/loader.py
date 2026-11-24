@@ -1,8 +1,15 @@
 import json
 import os
+from pathlib import Path
 from sports_package import Player, Team, Tournament
-DATA_DIR = os.path.dirname(os.path.abspath(__file__))
 
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR))
+
+"""DATA_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "data",
+)"""
 
 def get_available_files() -> list[str]:
     """Возвращает список всех .json файлов в папке data."""

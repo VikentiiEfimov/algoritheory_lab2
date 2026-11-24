@@ -1,9 +1,11 @@
 import os
+from pathlib import Path
 import sqlite3
 from sports_package import Player, Team, Tournament
 
-DB_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_NAME = os.path.join(DB_DIR, "tournament.db")
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR))
+DB_NAME = os.path.join(DATA_DIR, "tournament.db")
 
 
 def get_connection(db_path: str = DB_NAME) -> sqlite3.Connection:
@@ -20,7 +22,8 @@ def init_db(conn: sqlite3.Connection) -> None:
     cursor.executescript("""
         CREATE TABLE IF NOT EXISTS teams (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT UNIQUE NOT NULL
+            name TEXT UNIQUE NOT NULL,
+            created_at TEXT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS players (
@@ -28,6 +31,7 @@ def init_db(conn: sqlite3.Connection) -> None:
             name TEXT NOT NULL,
             position TEXT NOT NULL,
             team_id INTEGER NOT NULL,
+            created_at TEXT NOT NULL,
             FOREIGN KEY (team_id) REFERENCES teams(id) ON DELETE CASCADE
         );
 
@@ -36,7 +40,8 @@ def init_db(conn: sqlite3.Connection) -> None:
             home_team TEXT NOT NULL,
             away_team TEXT NOT NULL,
             home_goals INTEGER NOT NULL,
-            away_goals INTEGER NOT NULL
+            away_goals INTEGER NOT NULL,
+            created_at TEXT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS match_player_stats (
@@ -71,21 +76,24 @@ def save_tournament(tournament: Tournament, conn: sqlite3.Connection) -> None:
 
     # 1. Сохраняем команды и игроков
     for team in tournament.teams.values():
-        cursor.execute("INSERT INTO teams (name) VALUES (?)", (team.name,))
+        cursor.execute(
+            "INSERT INTO teams (name, created_at) VALUES (?, ?)",
+            (team.name, team.created_at),
+        )
         team_id = cursor.lastrowid
         for player in team.players.values():
             cursor.execute(
-                "INSERT INTO players (name, position, team_id) VALUES (?, ?, ?)",
-                (player.name, player.position, team_id),
+                "INSERT INTO players (name, position, team_id, created_at) VALUES (?, ?, ?, ?)",
+                (player.name, player.position, team_id, player.created_at),
             )
 
     # 2. Сохраняем матчи и статистику игроков в них
     for match in tournament.matches:
         cursor.execute(
-            """INSERT INTO matches (home_team, away_team, home_goals, away_goals)
-               VALUES (?, ?, ?, ?)""",
+            """INSERT INTO matches (home_team, away_team, home_goals, away_goals, created_at)
+               VALUES (?, ?, ?, ?, ?)""",
             (match.home_team.name, match.away_team.name,
-             match._home_goals, match._away_goals),
+             match.home_goals, match.away_goals, match.created_at),
         )
         match_id = cursor.lastrowid
 
@@ -110,32 +118,32 @@ def load_tournament(
     tournament: Tournament | None = None,
     tournament_name: str = "Футбольный турнир",
 ) -> Tournament:
-    """Загружает турнир из БД по аналогии с JSON-загрузчиком."""
+    """Загружает турнир из БД."""
     if tournament is None:
         tournament = Tournament(tournament_name)
 
     cursor = conn.cursor()
 
     # 1. Команды и игроки
-    teams_rows = cursor.execute("SELECT id, name FROM teams").fetchall()
+    teams_rows = cursor.execute("SELECT id, name, created_at FROM teams").fetchall()
     for t_row in teams_rows:
         t_name = t_row["name"]
-        tournament.add_team(Team(t_name))
+        tournament.add_team(Team(t_name, created_at=t_row["created_at"]))
 
         players_rows = cursor.execute(
-            "SELECT name, position FROM players WHERE team_id = ?",
+            "SELECT name, position, created_at FROM players WHERE team_id = ?",
             (t_row["id"],),
         ).fetchall()
 
         for p_row in players_rows:
             tournament.get_team(t_name).add_player(
-                Player(p_row["name"], p_row["position"])
+                Player(p_row["name"], p_row["position"], created_at=p_row["created_at"])
             )
 
     # 2. Матчи и статистика игроков
     loaded_matches = 0
     matches_rows = cursor.execute(
-        "SELECT id, home_team, away_team, home_goals, away_goals FROM matches"
+        "SELECT id, home_team, away_team, home_goals, away_goals, created_at FROM matches"
     ).fetchall()
 
     for m_row in matches_rows:
@@ -155,6 +163,8 @@ def load_tournament(
             m_row["home_goals"],
             m_row["away_goals"],
             player_stats if player_stats else None,
+            created_at=m_row["created_at"],
+            update_timestamps=False,
         )
         loaded_matches += 1
 

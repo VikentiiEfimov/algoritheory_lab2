@@ -4,7 +4,7 @@ from im_port.loader import load_from_json, get_available_files
 def import_data_menu(current_tournament: Tournament) -> Tournament:
     files = get_available_files()
     if not files:
-        print("В папке 'im_port' не найдено .json файлов.")
+        print("В папке 'data' не найдено .json файлов.")
         return current_tournament
     print("\nДоступные файлы:")
     for i, f in enumerate(files, 1):

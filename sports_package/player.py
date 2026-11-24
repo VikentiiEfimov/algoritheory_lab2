@@ -4,7 +4,8 @@ class Player(BaseEntity):
     HEADER_LABELS = ["Игрок", "Позиция", "Матчи", "Гол + Пас", "Ср. голов"]
     VALID_POSITIONS = {"Нападающий", "Защитник", "Вратарь", "Полузащитник"}
 
-    def __init__(self, name: str, position: str):
+    def __init__(self, name: str, position: str, created_at: str | None = None):
+        super().__init__(created_at)
         self.name = name
         self.position = position
         self._goals = 0

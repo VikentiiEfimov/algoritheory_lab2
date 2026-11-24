@@ -4,7 +4,8 @@ from .player import Player
 class Team(BaseEntity):
     HEADER_LABELS = ["Команда", "Игры", "Очки", "Победы", "Ничьи", "Поражения"]
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, created_at: str | None = None):
+        super().__init__(created_at)
         self.name = name
         self.players = {}
         self._wins = 0

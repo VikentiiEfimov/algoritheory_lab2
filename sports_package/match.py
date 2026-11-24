@@ -2,7 +2,8 @@ from .base import BaseEntity
 from .team import Team
 
 class Match(BaseEntity):
-    def __init__(self, home_team: Team, away_team: Team, home_goals: int, away_goals: int):
+    def __init__(self, home_team: Team, away_team: Team, home_goals: int, away_goals: int, created_at: str | None = None):
+        super().__init__(created_at)
         self.home_team = home_team
         self.away_team = away_team
         self.home_goals = home_goals

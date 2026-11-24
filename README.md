@@ -34,7 +34,6 @@ Sports Tournament Manager — консольный менеджер футбол
 ├── bd_port/           # Работа с SQLite (database.py, tournament.db)
 └── test_models.py     # Тесты моделей (pytest)
 ```
-text
 
 ## Инструкции по запуску
 
@@ -81,10 +80,10 @@ text
    docker run -it --rm sports-tournament
    ```
 
-### Запуск с сохранением базы между перезапусками (volume на папку bd_port):
+### Запуск с сохранением базы между перезапусками:
    ```bash
 
-   docker run -it --rm -v "${PWD}/bd_port:/app/bd_port" sports-tournament
+   docker run -it --rm -v "${PWD}:/app/data" sports-tournament
    ```
 
 ### Прогнать тесты в контейнере:

@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    stdin_open: true
+    tty: true
+    environment:
+      - DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+      - ./im_port:/app/im_port
+      - ./bd_port:/app/bd_port
+      - ./ex_port:/app/ex_port
