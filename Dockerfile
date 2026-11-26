@@ -8,20 +8,29 @@ WORKDIR /app
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
-# Указываем Python, где брать данные внутри контейнера
+# Единая папка данных (volume), эталонные JSON и доп. каталоги для импорта
 ENV DATA_DIR=/app/data
+ENV IMPORT_DIRS=/app/im_port
 
-# Создаём папку для данных, чтобы volume монтировался корректно
-RUN mkdir -p /app/data
+# Создаём папки для данных и seed
+RUN mkdir -p /app/data /app/seed
 
-# Сначала копируем только requirements, чтобы кэш слоёв работал эффективнее
+# Сначала зависимости — ради кэша слоёв
 COPY requirements.txt .
 
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем весь остальной код
+# Код проекта (включая im_port/*.json)
 COPY . .
 
-# Команда запуска (по умолчанию интерактивная консоль)
+# Эталонная БД — по отдельному пути, чтобы volume её не перекрывал
+COPY seed/ /app/seed/
+
+# Entrypoint: засеет /app/data из seed только если в /app/data пусто
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+
 CMD ["python", "main.py"]

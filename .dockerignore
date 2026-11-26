@@ -17,8 +17,6 @@ Dockerfile
 docker-compose.yml
 
 *.xlsx
-*.db
 data/
-im_port/*.json
 bd_port/*.db
 ex_port/*.xlsx

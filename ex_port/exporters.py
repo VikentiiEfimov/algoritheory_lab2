@@ -90,7 +90,7 @@ def export_to_excel(tournament: Tournament) -> None:
 
     base_dir = Path(__file__).resolve().parent
     data_dir = Path(os.getenv("DATA_DIR", base_dir))
-    os.makedirs(data_dir, exist_ok=True)
+    #os.makedirs(data_dir, exist_ok=True)
     report_path = os.path.join(data_dir, "tournament_report.xlsx")
     wb.save(report_path)
     print(f"Отчёт сохранён в файл '{report_path}'.")

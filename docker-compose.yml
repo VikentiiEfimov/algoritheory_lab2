@@ -5,8 +5,6 @@ services:
     tty: true
     environment:
       - DATA_DIR=/app/data
+      - IMPORT_DIRS=/app/im_port
     volumes:
       - ./data:/app/data
-      - ./im_port:/app/im_port
-      - ./bd_port:/app/bd_port
-      - ./ex_port:/app/ex_port

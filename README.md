@@ -68,26 +68,25 @@ Sports Tournament Manager — консольный менеджер футбол
    ```
 
 ### Запуск через Docker
-Сборка образа:
-   ```bash
-   
-   docker build -t sports-tournament .
-   ```
 
-### Тесты Запуск (флаг -it обязателен — приложение интерактивное и использует input()):
-   ```bash
+Сборка:
+```bash
+docker build -t sports-tournament .
+```
 
-   docker run -it --rm sports-tournament
-   ```
+Интерактивный запуск (`-it` обязателен — приложение использует `input()`):
+```bash
+mkdir -p data
+docker run -it --rm -v "${PWD}/data:/app/data" sports-tournament
+```
 
-### Запуск с сохранением базы между перезапусками:
-   ```bash
+Тесты в контейнере:
+```bash
+docker run --rm sports-tournament pytest -v
+```
 
-   docker run -it --rm -v "${PWD}:/app/data" sports-tournament
-   ```
-
-### Прогнать тесты в контейнере:
-   ```bash
-
-   docker run --rm sports-tournament pytest -v
-   ```
+Docker Compose:
+```bash
+docker compose build
+docker compose run --rm app
+```
